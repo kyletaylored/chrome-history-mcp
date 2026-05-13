@@ -1,0 +1,24 @@
+{
+    "dxt_version": "0.1",
+    "name": "chrome-history-mcp",
+    "display_name": "Chrome History MCP",
+    "version": "0.1.0",
+    "description": "Query Chrome browsing history via SQL against a lock-safe snapshot of the History DB.",
+    "author": {
+        "name": "Kyle Taylor"
+    },
+    "server": {
+        "type": "python",
+        "entry_point": "src/chrome_history_mcp/server.py",
+        "mcp_config": {
+            "command": "uv",
+            "args": [
+                "run",
+                "--directory",
+                "${__dirname}",
+                "chrome-history-mcp"
+            ],
+            "env": {}
+        }
+    }
+}
