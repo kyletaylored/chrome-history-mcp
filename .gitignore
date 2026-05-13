@@ -1,10 +1,56 @@
-# Python-generated files
+# Byte-compiled / optimized / cache
 __pycache__/
-*.py[oc]
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyre/
+.pytype/
+
+# Packaging / build
 build/
 dist/
 wheels/
-*.egg-info
+*.egg-info/
+*.egg
+.eggs/
+*.whl
+
+# DXT bundles
+*.dxt
 
 # Virtual environments
-.venv
+.venv/
+venv/
+env/
+ENV/
+
+# Coverage
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# AI / assistant metadata
+.claude/
+.cursor/
+.aider*
+
+# Local-only project notes
+prd.md

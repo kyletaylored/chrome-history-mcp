@@ -1,50 +1,131 @@
-# A mcp server expose your Chrome history to AI
+# chrome-history-mcp
 
-## Setup & Running
+An MCP server that exposes your local Chrome browsing history to LLMs through a
+single read-only SQL tool. Useful for activity reconstruction, time-tracking
+backfill, "what did I research last week," and similar workflows.
 
-   ```bash
-   uv run chrome-history-mcp
-   ```
-   It will use the default Chrome history path:
-   - Windows:   
-   C:\Users\<username>\AppData\Local\Google\Chrome\User Data\Default
-   - macOS:   
-   /Users/<username>/Library/Application Support/Google/Chrome/Default
-   - Linux:    
-    /home/<username>/.config/google-chrome/Default
+- **Lock-safe snapshots** via SQLite's online backup API — runs while Chrome is open.
+- **Read-only by construction** — the snapshot is opened with `mode=ro`, so any
+  `INSERT`/`UPDATE`/`DELETE` the LLM might emit fails at the SQLite layer.
+- **Result cap** at 1000 rows with a `truncated` flag, so unbounded queries
+  don't blow up the response.
+- **One tool**, `query-chrome-history`, with the `urls` + `visits` schema
+  inlined in its description so the LLM has what it needs to write SQL.
 
-   see the [details](https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location)
+![screenshot](snapshot.png)
 
-   otherwise use the `--path` to define the path of history, for example: `/Users/lipeng/Library/Application Support/Google/Chrome/Profile 3/History`(if you have multiple user in Chrome)
+## Install
 
-   ```bash
-   uv run chrome-history-mcp --path /Users/lipeng/Library/Application\ Support/Google/Chrome/Profile\ 3/History
-   ```
+### As a Claude Desktop Extension (one-click)
 
-## E2E
+Grab the latest `chrome-history-mcp.dxt` from the [Releases](https://github.com/kyletaylored/chrome-history-mcp/releases)
+page and double-click it. Claude Desktop's Extensions UI handles the rest.
 
-Leverage [mcp-cli-host](https://github.com/vincent-pli/mcp-cli-host) as mcp client
+Requires `uv` on your `PATH` — `brew install uv` on macOS, or see
+[astral.sh/uv](https://docs.astral.sh/uv/getting-started/installation/).
 
-### Set STDIO server config
+### In Claude Code
+
+From the cloned repo:
+
+```bash
+uv run poe install-cc
+```
+
+This runs `claude mcp add chrome-history -- uv run --directory "$PWD" chrome-history-mcp`.
+The tool is then available in any Claude Code session.
+
+### Manually (Claude Desktop config)
+
 ```json
 {
   "mcpServers": {
-    "a2a-mcp": {
+    "chrome-history": {
       "command": "uv",
-      "args": [
-        "--project",
-        "<location of the repo>",
-        "run",
-        "chrome-history-mcp",
-        "--path",
-        "<location of your chrome history>"
-      ]
+      "args": ["run", "--directory", "/absolute/path/to/chrome-history-mcp", "chrome-history-mcp"]
     }
   }
 }
 ```
 
-You can get this:
-![shapshot](shapshot.png)
+Drop that into `~/Library/Application Support/Claude/claude_desktop_config.json`
+(macOS) and restart Claude Desktop.
 
+## Usage
 
+```bash
+uv run chrome-history-mcp [--profile NAME] [--path FILE] [--verbose]
+```
+
+| Flag | Default | Notes |
+|---|---|---|
+| `--profile` | `Default` | Chrome profile directory name (e.g. `Default`, `Profile 1`). |
+| `--path` | _(auto)_ | Full path to a `History` file. Overrides `--profile`. |
+| `--verbose` | off | Log snapshot activity + path resolution to stderr. |
+
+Default history-file locations:
+
+| OS | Path |
+|---|---|
+| macOS | `~/Library/Application Support/Google/Chrome/<profile>/History` |
+| Linux | `~/.config/google-chrome/<profile>/History` |
+| Windows | `%LOCALAPPDATA%\Google\Chrome\User Data\<profile>\History` |
+
+See [Chrome history file location](https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location)
+for the full rundown.
+
+### Timestamp format
+
+`last_visit_time` and `visit_time` use Chrome's Webkit timestamps —
+microseconds since `1601-01-01 UTC`. To convert to a unix timestamp in SQL:
+
+```sql
+SELECT
+    url,
+    title,
+    datetime(last_visit_time / 1000000 - 11644473600, 'unixepoch', 'localtime') AS visited_at
+FROM urls
+ORDER BY last_visit_time DESC
+LIMIT 20;
+```
+
+## Development
+
+This repo uses `uv` for dependency management and `poethepoet` for task running.
+
+```bash
+uv sync --group dev    # install
+uv run poe             # list tasks
+```
+
+| Task | What it does |
+|---|---|
+| `uv run poe test` | Run the pytest suite |
+| `uv run poe lint` | `ruff check .` |
+| `uv run poe fmt` | `ruff format .` |
+| `uv run poe dev` | Run the server locally with `--verbose` |
+| `uv run poe inspect` | Launch [MCP Inspector](https://github.com/modelcontextprotocol/inspector) against the server (needs Node.js) |
+| `uv run poe install-cc` | Register with Claude Code in the current scope |
+| `uv run poe pack` | Build the `.dxt` extension bundle (needs `npm i -g @anthropic-ai/dxt`) |
+
+### Local testing without an LLM
+
+Use the MCP Inspector — it gives you a browser UI to list tools and invoke them
+with raw JSON arguments, no API key required:
+
+```bash
+uv run poe inspect
+```
+
+### Releasing
+
+The CI workflow builds and attaches a `.dxt` to any `v*` tag push:
+
+```bash
+git tag v0.2.0
+git push --tags
+```
+
+## License
+
+Apache 2.0 — see [LICENSE](LICENSE).
