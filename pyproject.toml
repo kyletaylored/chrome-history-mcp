@@ -17,9 +17,45 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "poethepoet>=0.30",
     "pytest>=8.0",
     "ruff>=0.12.4",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.poe.tasks.test]
+help = "Run the pytest suite"
+cmd = "pytest"
+
+[tool.poe.tasks.lint]
+help = "Lint with ruff"
+cmd = "ruff check ."
+
+[tool.poe.tasks.fmt]
+help = "Auto-format with ruff"
+cmd = "ruff format ."
+
+[tool.poe.tasks.dev]
+help = "Run the MCP server with verbose stderr logging (for manual stdio probing)"
+cmd = "chrome-history-mcp --verbose"
+
+[tool.poe.tasks.inspect]
+help = "Launch the MCP Inspector against this server (requires Node.js / npx)"
+cmd = "npx @modelcontextprotocol/inspector uv run chrome-history-mcp"
+
+[tool.poe.tasks.install-cc]
+help = "Register this server with Claude Code (local scope)"
+shell = "claude mcp add chrome-history -- uv run --directory \"$PWD\" chrome-history-mcp"
+
+[tool.poe.tasks.pack]
+help = "Build the .dxt extension bundle (requires the dxt CLI: npm i -g @anthropic-ai/dxt)"
+cmd = "dxt pack"
