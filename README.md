@@ -105,13 +105,37 @@ uv run poe             # list tasks
 | `uv run poe fmt` | `ruff format .` |
 | `uv run poe dev` | Run the server locally with `--verbose` |
 | `uv run poe inspect` | Launch [MCP Inspector](https://github.com/modelcontextprotocol/inspector) against the server (needs Node.js) |
+| `uv run poe smoke` | End-to-end smoke test: spawn the server via stdio and fire 5 canonical queries against your real Chrome history |
 | `uv run poe install-cc` | Register with Claude Code in the current scope |
 | `uv run poe pack` | Build the `.dxt` extension bundle (needs `npm i -g @anthropic-ai/dxt`) |
 
 ### Local testing without an LLM
 
-Use the MCP Inspector — it gives you a browser UI to list tools and invoke them
-with raw JSON arguments, no API key required:
+Two complementary options:
+
+**Scripted smoke test (recommended for "does it actually work?").** Spawns
+the server via stdio, fires five canonical queries through the MCP
+protocol, and prints pass/fail for each. Covers the wire layer plus your
+real Chrome history file:
+
+```bash
+uv run poe smoke
+```
+
+The five queries and what they verify:
+
+| # | What it checks |
+|---|---|
+| 1 | Both `urls` and `visits` tables are visible (`SELECT name FROM sqlite_master ...`) |
+| 2 | Snapshot is non-empty (`SELECT COUNT(*) FROM urls`) |
+| 3 | Webkit-timestamp conversion works (recent visits with human-readable `visited` column) |
+| 4 | Read-only guarantee — `INSERT` must fail with `readonly database` |
+| 5 | Result cap kicks in — `SELECT id, url FROM urls` returns `truncated: true` if you have >1000 rows |
+
+**MCP Inspector (recommended for interactive exploration).** Browser UI
+to list tools and invoke them with raw JSON arguments. The Inspector
+prints an auth-token URL — use that URL, click **Connect**, leave the
+terminal running:
 
 ```bash
 uv run poe inspect

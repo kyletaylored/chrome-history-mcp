@@ -82,3 +82,7 @@ shell = "claude mcp add chrome-history -- uv run --directory \"$PWD\" chrome-his
 [tool.poe.tasks.pack]
 help = "Build the .dxt extension bundle (requires the dxt CLI: npm i -g @anthropic-ai/dxt)"
 cmd = "dxt pack"
+
+[tool.poe.tasks.smoke]
+help = "Smoke-test the live server end-to-end against your real Chrome history"
+cmd = "python scripts/smoke.py"
