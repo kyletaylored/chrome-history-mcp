@@ -71,3 +71,6 @@ jobs:
         with:
           files: '*.mcpb'
           fail_on_unmatched_files: true
+          body_path: .github/release-template.md
+          generate_release_notes: true
+          make_latest: true
