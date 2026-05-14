@@ -49,7 +49,12 @@ def _refresh_snapshot() -> None:
         return
 
     logger.debug("Snapshotting %s -> %s", history_file_original, history_file_tmp)
-    src_uri = Path(history_file_original).as_uri() + "?mode=ro"
+    # Open the source with immutable=1: Chrome holds a write lock that blocks
+    # SQLite's backup API from getting a read transaction, causing backup() to
+    # spin in SQLITE_BUSY forever. immutable=1 tells SQLite to skip locking
+    # entirely. Trade-off: anything still in Chrome's WAL that hasn't been
+    # checkpointed is invisible to us — fine for history reconstruction.
+    src_uri = Path(history_file_original).as_uri() + "?immutable=1"
     with closing(sqlite3.connect(src_uri, uri=True)) as src, \
             closing(sqlite3.connect(history_file_tmp)) as dst:
         src.backup(dst)
