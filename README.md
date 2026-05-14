@@ -11,15 +11,28 @@ backfill, "what did I research last week," and similar workflows.
   don't blow up the response.
 - **One tool**, `query-chrome-history`, with the `urls` + `visits` schema
   inlined in its description so the LLM has what it needs to write SQL.
+- **Stays local** — the snapshot lives in your system tempdir under your UID;
+  nothing leaves your machine.
 
 ![screenshot](snapshot.png)
+
+Once installed, ask the model things like:
+
+> *"What were the top 10 sites I visited yesterday?"*
+> *"Find pages I visited last week whose titles mention `kubernetes`."*
+> *"How many unique URLs from `github.com` are in my history?"*
 
 ## Install
 
 ### As a Claude Desktop Extension (one-click)
 
 Grab the latest `chrome-history-mcp.mcpb` from the [Releases](https://github.com/kyletaylored/chrome-history-mcp/releases)
-page and double-click it. Claude Desktop's Extensions UI handles the rest.
+page and double-click it. Claude Desktop's Extensions UI walks you through:
+
+1. **Chrome Profile** — defaults to `Default`. If you use a separate work
+   profile, enter its directory name (e.g. `Profile 1`, `Profile 2`).
+   You can change this later in the extension settings.
+2. **Install** — confirms the install and registers the tool.
 
 Requires `uv` on your `PATH` — `brew install uv` on macOS, or see
 [astral.sh/uv](https://docs.astral.sh/uv/getting-started/installation/).
@@ -48,8 +61,13 @@ The tool is then available in any Claude Code session.
 }
 ```
 
-Drop that into `~/Library/Application Support/Claude/claude_desktop_config.json`
-(macOS) and restart Claude Desktop.
+Drop that into your Claude Desktop config and restart the app:
+
+| OS | Config path |
+|---|---|
+| macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Linux | `~/.config/Claude/claude_desktop_config.json` |
+| Windows | `%APPDATA%\Claude\claude_desktop_config.json` |
 
 ## Usage
 
@@ -59,7 +77,7 @@ uv run chrome-history-mcp [--profile NAME] [--path FILE] [--verbose]
 
 | Flag | Default | Notes |
 |---|---|---|
-| `--profile` | `Default` | Chrome profile directory name (e.g. `Default`, `Profile 1`). |
+| `--profile` | `Default` | Chrome profile directory name (e.g. `Default`, `Profile 1`). Surfaced as a config field when installed as an `.mcpb`. |
 | `--path` | _(auto)_ | Full path to a `History` file. Overrides `--profile`. |
 | `--verbose` | off | Log snapshot activity + path resolution to stderr. |
 
@@ -146,9 +164,13 @@ uv run poe inspect
 The CI workflow builds and attaches a `.mcpb` to any `v*` tag push:
 
 ```bash
-git tag v0.2.0
+git tag v0.1.0
 git push --tags
 ```
+
+After CI succeeds, edit the auto-created GitHub Release to add notes.
+Bump the `version` field in `manifest.json` and `pyproject.toml` to
+match each new tag.
 
 ## License
 
