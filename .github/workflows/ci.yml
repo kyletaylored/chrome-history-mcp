@@ -36,7 +36,7 @@ jobs:
         run: uv run poe test
 
   package:
-    name: package dxt
+    name: package mcpb
     needs: test
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
@@ -48,24 +48,24 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dxt CLI
-        run: npm install -g @anthropic-ai/dxt
+      - name: Install mcpb CLI
+        run: npm install -g @anthropic-ai/mcpb
 
       - name: Validate manifest
-        run: dxt validate manifest.json
+        run: mcpb validate manifest.json
 
       - name: Pack extension
-        run: dxt pack
+        run: mcpb pack
 
       - name: Upload as workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: chrome-history-mcp-dxt
-          path: '*.dxt'
+          name: chrome-history-mcpb
+          path: '*.mcpb'
           if-no-files-found: error
 
       - name: Attach to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: '*.dxt'
+          files: '*.mcpb'
           fail_on_unmatched_files: true

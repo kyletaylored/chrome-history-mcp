@@ -17,7 +17,8 @@ wheels/
 .eggs/
 *.whl
 
-# DXT bundles
+# MCP Bundle artifacts
+*.mcpb
 *.dxt
 
 # Virtual environments

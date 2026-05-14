@@ -18,7 +18,7 @@ backfill, "what did I research last week," and similar workflows.
 
 ### As a Claude Desktop Extension (one-click)
 
-Grab the latest `chrome-history-mcp.dxt` from the [Releases](https://github.com/kyletaylored/chrome-history-mcp/releases)
+Grab the latest `chrome-history-mcp.mcpb` from the [Releases](https://github.com/kyletaylored/chrome-history-mcp/releases)
 page and double-click it. Claude Desktop's Extensions UI handles the rest.
 
 Requires `uv` on your `PATH` — `brew install uv` on macOS, or see
@@ -107,7 +107,7 @@ uv run poe             # list tasks
 | `uv run poe inspect` | Launch [MCP Inspector](https://github.com/modelcontextprotocol/inspector) against the server (needs Node.js) |
 | `uv run poe smoke` | End-to-end smoke test: spawn the server via stdio and fire 5 canonical queries against your real Chrome history |
 | `uv run poe install-cc` | Register with Claude Code in the current scope |
-| `uv run poe pack` | Build the `.dxt` extension bundle (needs `npm i -g @anthropic-ai/dxt`) |
+| `uv run poe pack` | Build the `.mcpb` extension bundle (needs `npm i -g @anthropic-ai/mcpb`) |
 
 ### Local testing without an LLM
 
@@ -143,7 +143,7 @@ uv run poe inspect
 
 ### Releasing
 
-The CI workflow builds and attaches a `.dxt` to any `v*` tag push:
+The CI workflow builds and attaches a `.mcpb` to any `v*` tag push:
 
 ```bash
 git tag v0.2.0

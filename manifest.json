@@ -1,11 +1,40 @@
 {
-    "dxt_version": "0.1",
+    "manifest_version": "0.2",
     "name": "chrome-history-mcp",
     "display_name": "Chrome History MCP",
     "version": "0.1.0",
-    "description": "Query Chrome browsing history via SQL against a lock-safe snapshot of the History DB.",
+    "description": "Query Chrome browsing history via SQL against a lock-safe snapshot.",
+    "long_description": "Exposes your local Chrome browsing history to LLMs through a single read-only SQL tool. Uses SQLite's online backup API for lock-safe snapshots that work while Chrome is running, opens the snapshot read-only so the model can't mutate it, and caps results at 1000 rows. Useful for activity reconstruction, time-tracking backfill, and 'what did I research last week' workflows.",
     "author": {
         "name": "Kyle Taylor"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/kyletaylored/chrome-history-mcp",
+    "documentation": "https://github.com/kyletaylored/chrome-history-mcp#readme",
+    "support": "https://github.com/kyletaylored/chrome-history-mcp/issues",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/kyletaylored/chrome-history-mcp"
+    },
+    "keywords": [
+        "chrome",
+        "browser",
+        "history",
+        "sqlite",
+        "activity-reconstruction",
+        "calendar"
+    ],
+    "screenshots": [
+        "snapshot.png"
+    ],
+    "user_config": {
+        "profile": {
+            "type": "string",
+            "title": "Chrome Profile",
+            "description": "Chrome profile directory name. Use 'Default' for your primary profile, or 'Profile 1' / 'Profile 2' / etc. for additional profiles.",
+            "default": "Default",
+            "required": false
+        }
     },
     "server": {
         "type": "python",
@@ -16,7 +45,9 @@
                 "run",
                 "--directory",
                 "${__dirname}",
-                "chrome-history-mcp"
+                "chrome-history-mcp",
+                "--profile",
+                "${user_config.profile}"
             ],
             "env": {}
         }

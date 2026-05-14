@@ -1,0 +1,36 @@
+# Dev-only files that shouldn't ship in the extension bundle.
+
+# Source control / CI
+.git/
+.github/
+.gitignore
+
+# Test + dev scripts
+tests/
+scripts/
+
+# Local dev configs
+mcp-inspector.json
+.vscode/
+.idea/
+.claude/
+
+# Caches
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Venvs / build artifacts
+.venv/
+build/
+dist/
+*.egg-info/
+*.mcpb
+*.dxt
+
+# Project planning (not extension content)
+prd.md
+
+# OS junk
+.DS_Store

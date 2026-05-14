@@ -80,8 +80,8 @@ help = "Register this server with Claude Code (local scope)"
 shell = "claude mcp add chrome-history -- uv run --directory \"$PWD\" chrome-history-mcp"
 
 [tool.poe.tasks.pack]
-help = "Build the .dxt extension bundle (requires the dxt CLI: npm i -g @anthropic-ai/dxt)"
-cmd = "dxt pack"
+help = "Build the .mcpb extension bundle (requires the mcpb CLI: npm i -g @anthropic-ai/mcpb)"
+cmd = "mcpb pack"
 
 [tool.poe.tasks.smoke]
 help = "Smoke-test the live server end-to-end against your real Chrome history"
