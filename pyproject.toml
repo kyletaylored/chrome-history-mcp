@@ -73,7 +73,7 @@ cmd = "chrome-history-mcp --verbose"
 
 [tool.poe.tasks.inspect]
 help = "Launch the MCP Inspector against this server (requires Node.js / npx)"
-cmd = "npx @modelcontextprotocol/inspector uv run chrome-history-mcp"
+cmd = "npx @modelcontextprotocol/inspector --config mcp-inspector.json --server chrome-history"
 
 [tool.poe.tasks.install-cc]
 help = "Register this server with Claude Code (local scope)"
